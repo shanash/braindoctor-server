@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+
+    <% data.forEach(function(val){ %>
+        <li><a href="api/download/<%= val %>"><%= val %></a></li>
+    <% }) %>
+
+</body>
+</html>

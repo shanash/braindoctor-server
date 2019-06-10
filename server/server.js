@@ -3,6 +3,10 @@ import routes, { api } from './routes';
 
 const app = express();
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

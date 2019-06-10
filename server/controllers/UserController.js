@@ -1,5 +1,4 @@
 import BaseController from './BaseController';
-import { User } from '../models';
 
 class UserController extends BaseController {
 
