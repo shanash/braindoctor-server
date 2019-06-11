@@ -25,6 +25,12 @@ class FileController extends BaseController {
       console.log('data : ', data);
       res.json(data);
 
+      let dir = './data';
+
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+
       let writeStream = fs.createWriteStream('./data/' + req.file.filename.split('.')[0] + '.json');
       writeStream.write(JSON.stringify(data));
       writeStream.end();
