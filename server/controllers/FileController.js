@@ -1,10 +1,10 @@
 import BaseController from './BaseController';
 import excelToJson from 'convert-excel-to-json';
+import fs from 'fs';
 
 class FileController extends BaseController {
   add = async (req, res, next) => {
     let path = req.file.destination + req.file.filename;
-    let fs = require('fs');
     let readStream = fs.createReadStream(path);
     
     let chunks = [];
@@ -26,7 +26,7 @@ class FileController extends BaseController {
 
       let dir = './data';
 
-      if (!fs.existsSync(dir)) {
+      if (false == fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
@@ -44,4 +44,6 @@ class FileController extends BaseController {
   }
 }
 
-export default new FileController();
+const FC = new FileController();
+
+export default FC;

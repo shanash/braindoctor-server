@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import FileController from '../controllers/FileController';
+import FC from '../controllers/FileController';
+import fs from 'fs';
 
 const routes = new Router();
 const multer = require('multer');
@@ -7,10 +8,9 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function(req, file ,callback){
-      let fs = require('fs');
       let dir = './upload';
 
-      if (!fs.existsSync(dir)) {
+      if (false == fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
       
@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
   });
 let upload = multer({ storage: storage});
 
-routes.post('/upload/create', upload.single('imgFile'), FileController.add);
-routes.get('/download/:id', FileController.get);
+routes.post('/upload/create', upload.single('imgFile'), FC.add);
+routes.get('/download/:id', FC.get);
 
 export default routes;
