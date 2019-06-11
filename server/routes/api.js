@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import UserController from '../controllers/UserController';
 import FileController from '../controllers/FileController';
 
 const routes = new Router();
@@ -24,10 +23,6 @@ const storage = multer.diskStorage({
     }
   });
 let upload = multer({ storage: storage});
-
-routes.get('/users', UserController.list);
-routes.get('/users/:id', UserController.get);
-routes.post('/users', UserController.add);
 
 routes.post('/upload/create', upload.single('imgFile'), FileController.add);
 routes.get('/download/:id', FileController.get);

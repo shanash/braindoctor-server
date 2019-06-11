@@ -1,5 +1,4 @@
 import BaseController from './BaseController';
-import { User } from '../models';
 import excelToJson from 'convert-excel-to-json';
 
 class FileController extends BaseController {
