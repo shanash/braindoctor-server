@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import FC from '../controllers/FileController';
 import fs from 'fs';
+import multer from 'multer';
+import path from 'path';
 
 const routes = new Router();
-const multer = require('multer');
-const path = require('path');
 
-const storage = multer.diskStorage({
+const storageXlsx = multer.diskStorage({
     destination: function(req, file ,callback){
       let dir = './upload';
 
@@ -22,9 +22,9 @@ const storage = multer.diskStorage({
       callback(null, basename + "-" + Date.now() + extension);
     }
   });
-let upload = multer({ storage: storage});
+let upload = multer({ storage: storageXlsx});
 
-routes.post('/upload/create', upload.single('imgFile'), FC.add);
+routes.post('/upload/create', upload.single('data'), FC.add);
 routes.get('/download/:id', FC.get);
 
 export default routes;

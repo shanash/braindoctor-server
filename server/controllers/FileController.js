@@ -3,6 +3,10 @@ import excelToJson from 'convert-excel-to-json';
 import fs from 'fs';
 
 class FileController extends BaseController {
+  isJsonString() {
+    console.log('call IsJsonString');
+  }
+
   add = async (req, res, next) => {
     let path = req.file.destination + req.file.filename;
     let readStream = fs.createReadStream(path);
@@ -18,20 +22,30 @@ class FileController extends BaseController {
     });
 
     readStream.on('end', function() {
-      let result = Buffer.concat(chunks);
-      let data = excelToJson({source:result});
-      
-      console.log('data : ', data);
-      res.json(data);
-
       let dir = './data';
-
+  
       if (false == fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
+      let result = Buffer.concat(chunks);
+      let strJson;
+
+      try {
+        JSON.parse(result.toString());
+        strJson = result.toString();
+        console.log('success');
+      } catch (e) {
+        console.log('e : ', e);
+        let data = excelToJson({source:result});
+
+        strJson = JSON.stringify(data);
+
+      }
+      res.json(strJson);
+
       let writeStream = fs.createWriteStream('./data/' + req.file.filename.split('.')[0] + '.json');
-      writeStream.write(JSON.stringify(data));
+      writeStream.write(strJson);
       writeStream.end();
     });
   }
