@@ -7,7 +7,7 @@
 <body>
 
     <form action="/api/upload/create" method="post" enctype="multipart/form-data">
-        <input type="text" value={this.state.name} name="name">
+        <input type="text" name="name">
         <input type="file" name="data">
         <input type="submit" value="파일 업로드하기">
     </form>
