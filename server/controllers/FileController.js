@@ -12,6 +12,60 @@ var FileController = class FileController extends BaseController {
       }
       return true;
     }
+    const convertDataForClient = (data) => {
+      var result = new Object();
+      Object.keys(data).forEach(function(key) {
+        switch(key) {
+          case 'Common':
+            var commonData = data[key]; 
+            var jCommon = new Object();
+            Object.keys(commonData).forEach(function(index) {
+              if (index != 0) {
+                var jarr = new Array();
+                var arrValue = commonData[index]['B'].toString().split('\r\n');
+                arrValue.forEach(function (item, index, array) {
+                  jarr.push(item);
+                });
+                jCommon[commonData[index]['A']] = jarr;
+              }
+            });
+            result['Common'] = jCommon;
+            break;
+          case 'List':
+            var listData = data[key];
+            var jList = new Array();
+            Object.keys(listData).forEach(function(index) {
+              if (index != 0) {
+                var jobj = new Object();
+                Object.keys(listData[index]).forEach(function(innerKey) {
+                  jobj[listData[0][innerKey]] = listData[index][innerKey];
+                });
+                jList.push(jobj);
+              }
+            });
+            result['List'] = jList;
+            break;
+          case 'Dictionary':
+            var dicData = data[key];
+            var jDic = new Object();
+            Object.keys(dicData).forEach(function(index) {
+              if (index != 0) {
+                var jobj = new Object();
+                Object.keys(dicData[index]).forEach(function(innerKey) {
+                  if (innerKey != 'A') {
+                    jobj[dicData[0][innerKey]] = dicData[index][innerKey];
+                  }
+                });
+                jDic[dicData[index]['A']] = jobj;
+              }
+            });
+            result['Dictionary'] = jDic;
+            break;
+        }
+      });
+
+      return result;
+    }
 
     super.add();
     let path = req.file.destination + req.file.filename;
@@ -36,13 +90,18 @@ var FileController = class FileController extends BaseController {
 
       let result = Buffer.concat(chunks);
       let strJson = result.toString();
+      let data;
 
-      if (false ==isJsonString(strJson)) {
-        let data = excelToJson({source:result});
+      if (false == isJsonString(strJson)) {
+        data = excelToJson({source:result});
 
         strJson = JSON.stringify(data);
+      } else {
+        data = JSON.parse(strJson);
       }
+      var jData = convertDataForClient(data);
 
+      strJson = JSON.stringify(jData);
       res.json(strJson);
 
       let writeStream = fs.createWriteStream('./data/' + req.body.name + '.json');
