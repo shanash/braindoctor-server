@@ -3,52 +3,7 @@ import excelToJson from 'convert-excel-to-json';
 import fs from 'fs';
 
 var FileController = class FileController extends BaseController {
-  async add(req, res, next) {
-    const onReadStreamReadable = () => {
-      let chunk = readStream.read();
-      if (null != chunk)
-      {
-        chunks.push(chunk);
-      }
-    }
-
-    const onReadStreamEnd = () => {
-      let dir = './data';
-  
-      if (false == fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
-
-      let result = Buffer.concat(chunks);
-      let strJson = result.toString();
-      let data;
-
-      if (false == isJsonString(strJson)) {
-        data = excelToJson({source:result});
-
-        strJson = JSON.stringify(data);
-      } else {
-        data = JSON.parse(strJson);
-      }
-      var jData = convertDataForClient(data);
-
-      strJson = JSON.stringify(jData);
-      res.json(strJson);
-
-      let writeStream = fs.createWriteStream('./data/' + req.body.name + '.json');
-      writeStream.write(strJson);
-      writeStream.end();
-
-    }
-
-    const isJsonString = (str) => {
-      try {
-        JSON.parse(str);
-      } catch(e) {
-        return false;
-      }
-      return true;
-    }
+  async parse(req, res, next) {
     const convertValue = (value) => {
       var strValue = value.toString();
       if ( true == strValue.includes('\r\n') ) {
@@ -114,7 +69,51 @@ var FileController = class FileController extends BaseController {
       return result;
     }
 
-    super.add();
+    const isJsonString = (str) => {
+      try {
+        JSON.parse(str);
+      } catch(e) {
+        return false;
+      }
+      return true;
+    }
+
+    const onReadStreamReadable = () => {
+      let chunk = readStream.read();
+      if (null != chunk)
+      {
+        chunks.push(chunk);
+      }
+    }
+
+    const onReadStreamEnd = () => {
+      let dir = './data';
+  
+      if (false == fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+
+      let result = Buffer.concat(chunks);
+      let strJson = result.toString();
+      let data;
+
+      if (false == isJsonString(strJson)) {
+        data = excelToJson({source:result});
+
+        strJson = JSON.stringify(data);
+      } else {
+        data = JSON.parse(strJson);
+      }
+      var jData = convertDataForClient(data);
+
+      strJson = JSON.stringify(jData, null, '\t');
+      res.render('pages/add', {
+        data: {
+          contents: strJson
+        }
+      });
+
+    }    
     let path = req.file.destination + req.file.filename;
     let readStream = fs.createReadStream(path);
     
@@ -122,6 +121,12 @@ var FileController = class FileController extends BaseController {
 
     readStream.on('readable', onReadStreamReadable);
     readStream.on('end', onReadStreamEnd);
+
+
+  }
+
+  async add(req, res, next) {
+    super.add();
   }
 
   async get(req, res, next) {

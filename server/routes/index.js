@@ -8,10 +8,7 @@ const folder = './data/';
 
 routes.get('/', (req, res) => res.render('pages/index.ejs'));//.status(400).end());
 routes.get('/add', (req, res) => {res.render('pages/add.ejs', {
-    data: {
-        id: "Title",
-        contents: FC.contents()
-    }
+    data: {}
 } );});
 routes.get('/list', (req, res) => {
     let filenames = new Array;
