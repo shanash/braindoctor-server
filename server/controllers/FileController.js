@@ -1,74 +1,14 @@
+import routes from '../routes/api';
 import BaseController from './BaseController';
 import excelToJson from 'convert-excel-to-json';
 import fs from 'fs';
+import request from 'request';
+import url from 'url';
 
-var FileController = class FileController extends BaseController {
-  async parse(req, res, next) {
-    const convertValue = (value) => {
-      var strValue = value.toString();
-      if ( true == strValue.includes('\r\n') ) {
-        var jarr = new Array();
-        var arrValue = strValue.split('\r\n');
-        arrValue.forEach(function (item, index, array) {
-          jarr.push(item);
-        });
+class FileController extends BaseController {
 
-        return jarr;
-      }
-
-      return value;
-    }
-
-    const convertDataForClient = (data) => {
-      var result = new Object();
-      Object.keys(data).forEach(function(key) {
-        switch(key) {
-          case 'Common':
-            var commonData = data[key]; 
-            var jCommon = new Object();
-            Object.keys(commonData).forEach(function(index) {
-              if (index != 0) {
-               jCommon[commonData[index]['A']] = convertValue(commonData[index]['B']);
-              }
-            });
-            result['Common'] = jCommon;
-            break;
-          case 'List':
-            var listData = data[key];
-            var jList = new Array();
-            Object.keys(listData).forEach(function(index) {
-              if (index != 0) {
-                var jobj = new Object();
-                Object.keys(listData[index]).forEach(function(innerKey) {
-                  jobj[listData[0][innerKey]] = convertValue(listData[index][innerKey]);
-                });
-                jList.push(jobj);
-              }
-            });
-            result['List'] = jList;
-            break;
-          case 'Dictionary':
-            var dicData = data[key];
-            var jDic = new Object();
-            Object.keys(dicData).forEach(function(index) {
-              if (index != 0) {
-                var jobj = new Object();
-                Object.keys(dicData[index]).forEach(function(innerKey) {
-                  if (innerKey != 'A') {
-                    jobj[dicData[0][innerKey]] = convertValue(dicData[index][innerKey]);
-                  }
-                });
-                jDic[dicData[index]['A']] = jobj;
-              }
-            });
-            result['Dictionary'] = jDic;
-            break;
-        }
-      });
-
-      return result;
-    }
-
+  // read()
+  async read(req, res, next) {
     const isJsonString = (str) => {
       try {
         JSON.parse(str);
@@ -96,7 +36,7 @@ var FileController = class FileController extends BaseController {
       let result = Buffer.concat(chunks);
       let strJson = result.toString();
       let data;
-
+      
       if (false == isJsonString(strJson)) {
         data = excelToJson({source:result});
 
@@ -104,16 +44,25 @@ var FileController = class FileController extends BaseController {
       } else {
         data = JSON.parse(strJson);
       }
-      var jData = convertDataForClient(data);
-
-      strJson = JSON.stringify(jData, null, '\t');
-      res.render('pages/add', {
-        data: {
-          contents: strJson
-        }
+      
+      const option = {
+        uri:'http://localhost:3000/api/parse-excel/',
+        method: 'POST',
+        body: data,
+        json: true
+      }
+      
+      request.post('http://localhost:3000/api/parse-excel/', option, function(err,response,body) {
+        res.redirect(url.format({
+          pathname:'/edit',
+          method:'post',
+          query: {
+            contents: response.body
+          }
+        }));
       });
+    }
 
-    }    
     let path = req.file.destination + req.file.filename;
     let readStream = fs.createReadStream(path);
     
@@ -121,14 +70,94 @@ var FileController = class FileController extends BaseController {
 
     readStream.on('readable', onReadStreamReadable);
     readStream.on('end', onReadStreamEnd);
-
-
   }
 
-  async add(req, res, next) {
+  // parseExcel()
+  async parseExcel(req, res, next) {
+    const convertValue = (value) => {
+      let strValue = value.toString();
+      if ( true == strValue.includes('\r\n') ) {
+        let jarr = new Array();
+        let arrValue = strValue.split('\r\n');
+        arrValue.forEach(function (item, index, array) {
+          jarr.push(item);
+        });
+
+        return jarr;
+      }
+
+      return value;
+    }
+
+    const convertDataForClient = (data) => {
+      let result = new Object();
+      Object.keys(data).forEach(function(key) {
+        switch(key) {
+          case 'Common':
+            let commonData = data[key]; 
+            let jCommon = new Object();
+            Object.keys(commonData).forEach(function(index) {
+              if (index != 0) {
+               jCommon[commonData[index]['A']] = convertValue(commonData[index]['B']);
+              }
+            });
+            result['Common'] = jCommon;
+            break;
+          case 'List':
+            let listData = data[key];
+            let jList = new Array();
+            Object.keys(listData).forEach(function(index) {
+              if (index != 0) {
+                let jobj = new Object();
+                Object.keys(listData[index]).forEach(function(innerKey) {
+                  jobj[listData[0][innerKey]] = convertValue(listData[index][innerKey]);
+                });
+                jList.push(jobj);
+              }
+            });
+            result['List'] = jList;
+            break;
+          case 'Dictionary':
+            let dicData = data[key];
+            let jDic = new Object();
+            Object.keys(dicData).forEach(function(index) {
+              if (index != 0) {
+                let jobj = new Object();
+                Object.keys(dicData[index]).forEach(function(innerKey) {
+                  if (innerKey != 'A') {
+                    jobj[dicData[0][innerKey]] = convertValue(dicData[index][innerKey]);
+                  }
+                });
+                jDic[dicData[index]['A']] = jobj;
+              }
+            });
+            result['Dictionary'] = jDic;
+            break;
+        }
+      });
+
+      return result;
+    }
+
+    const data = req.body;
+    let jData = convertDataForClient(data);
+    let strJson = JSON.stringify(jData, null, '\t');
+
+    res.json(strJson);
+  }
+
+  // write()
+  async write(req, res, next) {
     super.add();
+    
+    let writeStream = fs.createWriteStream('./data/' + req.body.title + '.json');
+    writeStream.write(req.body.contents);
+    writeStream.end();
+
+    res.redirect(302, '/add');
   }
 
+  // get()
   async get(req, res, next) {
     super.get();
     const id = req.params.id;

@@ -24,8 +24,10 @@ const storageXlsx = multer.diskStorage({
   });
 let storage = multer({ storage: storageXlsx});
 
-//routes.post('/upload/create', upload.single('data'), FC.add);
 routes.get('/download/:id', FC.get);
-routes.post('/parse-excel', storage.single('data'), FC.parse);
+
+routes.post('/read', storage.single('data'), FC.read);
+routes.post('/parse-excel', storage.single('data'), FC.parseExcel);
+routes.post('/write', FC.write);
 
 export default routes;
