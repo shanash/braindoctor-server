@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import api from './api';
 import fs from 'fs';
-import FC from '../controllers/FileController';
 
 const routes = new Router();
 const folder = './data/';

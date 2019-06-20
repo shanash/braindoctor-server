@@ -171,6 +171,4 @@ class FileController extends BaseController {
   }
 }
 
-const FC = new FileController();
-
-export default FC;
+export default FileController;

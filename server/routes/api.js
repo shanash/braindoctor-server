@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import FC from '../controllers/FileController';
 import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
+import FileController from '../controllers/FileController';
 
+const FC = new FileController();
 const routes = new Router();
 
 const storageXlsx = multer.diskStorage({
