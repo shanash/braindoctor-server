@@ -11,9 +11,17 @@ export default class BaseController {
     }
   }
   */
-  async add(req, res, next) {
+ /*
+  async read(path) {
+    
   }
 
-  async get(req, res, next) {
+  async write(path) {
+
   }
+
+  async remove(path) {
+
+  }
+  */
 }

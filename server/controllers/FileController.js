@@ -1,14 +1,36 @@
-import routes from '../routes/api';
 import BaseController from './BaseController';
 import excelToJson from 'convert-excel-to-json';
 import fs from 'fs';
-import request from 'request';
-import url from 'url';
+import aw from 'awaitify-stream';
 
-class FileController extends BaseController {
+export default class FileController extends BaseController {
+  async read(path) {
+    let readStream = fs.createReadStream(path);
+    let reader = aw.createReader(readStream);
+    let chunk, count = 0;
+    let chunks = [];
 
-  // read()
-  async read(req, res, next) {
+    while (null !== (chunk = await reader.readAsync())) {
+        // Perform any synchronous or asynchronous operation here.
+        if (null != chunk)
+        {
+          chunks.push(chunk);
+        }
+        count++;
+    }
+
+    let dir = './data';
+  
+      if (false == fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+
+      let data = Buffer.concat(chunks);
+
+      return data; 
+  }
+
+  async parseExcel(data) {
     const isJsonString = (str) => {
       try {
         JSON.parse(str);
@@ -17,63 +39,7 @@ class FileController extends BaseController {
       }
       return true;
     }
-
-    const onReadStreamReadable = () => {
-      let chunk = readStream.read();
-      if (null != chunk)
-      {
-        chunks.push(chunk);
-      }
-    }
-
-    const onReadStreamEnd = () => {
-      let dir = './data';
-  
-      if (false == fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
-
-      let result = Buffer.concat(chunks);
-      let strJson = result.toString();
-      let data;
-      
-      if (false == isJsonString(strJson)) {
-        data = excelToJson({source:result});
-
-        strJson = JSON.stringify(data);
-      } else {
-        data = JSON.parse(strJson);
-      }
-      
-      const option = {
-        uri:'http://localhost:3000/api/parse-excel/',
-        method: 'POST',
-        body: data,
-        json: true
-      }
-      
-      request.post('http://localhost:3000/api/parse-excel/', option, function(err,response,body) {
-        res.redirect(url.format({
-          pathname:'/edit',
-          method:'post',
-          query: {
-            contents: response.body
-          }
-        }));
-      });
-    }
-
-    let path = req.file.destination + req.file.filename;
-    let readStream = fs.createReadStream(path);
     
-    let chunks = [];
-
-    readStream.on('readable', onReadStreamReadable);
-    readStream.on('end', onReadStreamEnd);
-  }
-
-  // parseExcel()
-  async parseExcel(req, res, next) {
     const convertValue = (value) => {
       let strValue = value.toString();
       if ( true == strValue.includes('\r\n') ) {
@@ -139,36 +105,35 @@ class FileController extends BaseController {
       return result;
     }
 
-    const data = req.body;
+    if (false == isJsonString(strJson)) {
+      data = excelToJson({source:data});
+
+    } else {
+      data = JSON.parse(strJson);
+    }
+
     let jData = convertDataForClient(data);
     let strJson = JSON.stringify(jData, null, '\t');
 
-    res.json(strJson);
+    return strJson
   }
 
   // write()
-  async write(req, res, next) {
-    super.add();
-    
-    let writeStream = fs.createWriteStream('./data/' + req.body.title + '.json');
-    writeStream.write(req.body.contents);
+  async write(path, contents) {
+    let writeStream = fs.createWriteStream(path);
+    writeStream.write(contents);
     writeStream.end();
-
-    res.redirect(302, '/add');
   }
 
-  // get()
-  async get(req, res, next) {
-    super.get();
-    const id = req.params.id;
-    const path = './data/' + id;
+  async remove(path) {
     if (false == fs.existsSync(path))
     {
-      return res.status(404);
+      return false;
     }
 
-    res.download(path);
+    fs.unlinkSync(path);
+
+    return true;
   }
 }
 
-export default FileController;

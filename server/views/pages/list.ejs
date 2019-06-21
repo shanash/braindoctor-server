@@ -12,9 +12,15 @@
 	<main>
 		<div class="jumbotron">
 			<h1>List</h1>
+			<ul>
             <% data.forEach(function(val){ %>
-                <li><a href="api/download/<%= val %>"><%= val %></a></li>
-            <% }) %>
+				<p><li><%= val %><br>
+					<form action="/api/download/<%= val %>", method="get"><button type="submit" name="filename" class="btn btn-primary"">다운로드</button></form>
+					<form action="/api/edit", method="post"><button type="submit" name="filename" class="btn btn-primary" value="<%= val %>">편집</button></form>
+					<form action="/api/remove", method="post"><button type="submit" name="filename" class="btn btn-primary" value="<%= val %>">삭제</button></form></li>
+				</p>
+			<% }) %>
+			</ul>
 		</div>
 	</main>
 

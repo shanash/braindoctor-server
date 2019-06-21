@@ -10,6 +10,7 @@ routes.get('/add', (req, res) => res.render('pages/add.ejs', {data: {}}));
 routes.get('/edit/', (req, res) => {
     res.render('pages/edit.ejs', {
         data: {
+          title: req.query.title,
           contents: req.query.contents
         }
     });

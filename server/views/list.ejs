@@ -6,9 +6,10 @@
 </head>
 <body>
 
+  <ul>
     <% data.forEach(function(val){ %>
         <li><a href="/api/download/<%= val %>"><%= val %></a></li>
     <% }) %>
-
+  </ul>
 </body>
 </html>
