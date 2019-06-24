@@ -5,8 +5,10 @@ import path from 'path';
 import request from 'request';
 import url from 'url';
 import FileController from '../controllers/FileController';
+import ExcelParser from '../controllers/ExcelParser';
 
 const FC = new FileController();
+const EP = new ExcelParser();
 const routes = new Router();
 
 const storageXlsx = multer.diskStorage({
@@ -62,7 +64,7 @@ routes.post('/edit', async (req, res, next) => {
 routes.post('/read-excel', storage.single('data'), async (req, res, next) => {
   let path = req.file.destination + req.file.filename;
   let data = await FC.read(path);
-  let jsonString = await FC.parseExcel(data);
+  let jsonString = await EP.parseToJsonString(data);
 
   res.redirect(url.format({
     pathname:'/edit',
