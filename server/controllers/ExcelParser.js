@@ -18,50 +18,56 @@ export default class ExcelParser extends Parser {
       return value;
     }
 
-    data = excelToJson({ source: data });
+    let excelData = excelToJson({ source: data });
     let result = new Object();
-    Object.keys(data).forEach(function (key) {
-      switch (key) {
+    Object.keys(excelData).forEach(function (sheetName) {
+      switch (sheetName) {
         case 'Common':
-          let commonData = data[key];
-          let jCommon = new Object();
-          Object.keys(commonData).forEach(function (index) {
-            if (index != 0) {
-              jCommon[commonData[index]['A']] = ConvertValue(commonData[index]['B']);
-            }
-          });
-          result['Common'] = jCommon;
-          break;
+          {
+            let sheet = excelData[sheetName];
+            let jCommon = new Object();
+            Object.keys(sheet).forEach(function (hIndex) {
+              if (hIndex != 0) {
+                jCommon[sheet[hIndex]['A']] = ConvertValue(sheet[hIndex]['B']);
+              }
+            });
+            result['Common'] = jCommon;
+            break;
+          }
         case 'List':
-          let listData = data[key];
-          let jList = new Array();
-          Object.keys(listData).forEach(function (index) {
-            if (index != 0) {
-              let jobj = new Object();
-              Object.keys(listData[index]).forEach(function (innerKey) {
-                jobj[listData[0][innerKey]] = ConvertValue(listData[index][innerKey]);
-              });
-              jList.push(jobj);
-            }
-          });
-          result['List'] = jList;
-          break;
+          {
+            let sheet = excelData[sheetName];
+            let jList = new Array();
+            Object.keys(sheet).forEach(function (hIndex) {
+              if (hIndex != 0) {
+                let jobj = new Object();
+                Object.keys(sheet[hIndex]).forEach(function (wIndex) {
+                  jobj[sheet[0][wIndex]] = ConvertValue(sheet[hIndex][wIndex]);
+                });
+                jList.push(jobj);
+              }
+            });
+            result['List'] = jList;
+            break;
+          }
         case 'Dictionary':
-          let dicData = data[key];
-          let jDic = new Object();
-          Object.keys(dicData).forEach(function (index) {
-            if (index != 0) {
-              let jobj = new Object();
-              Object.keys(dicData[index]).forEach(function (innerKey) {
-                if (innerKey != 'A') {
-                  jobj[dicData[0][innerKey]] = ConvertValue(dicData[index][innerKey]);
-                }
-              });
-              jDic[dicData[index]['A']] = jobj;
-            }
-          });
-          result['Dictionary'] = jDic;
-          break;
+          {
+            let sheet = excelData[sheetName];
+            let jDic = new Object();
+            Object.keys(sheet).forEach(function (hIndex) {
+              if (hIndex != 0) {
+                let jobj = new Object();
+                Object.keys(sheet[hIndex]).forEach(function (wIndex) {
+                  if (wIndex != 'A') {
+                    jobj[sheet[0][wIndex]] = ConvertValue(sheet[hIndex][wIndex]);
+                  }
+                });
+                jDic[sheet[hIndex]['A']] = jobj;
+              }
+            });
+            result['Dictionary'] = jDic;
+            break;
+          }
       }
     });
 
