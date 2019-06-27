@@ -1,7 +1,7 @@
 import BaseController from './BaseController';
 import fs from 'fs';
 import aw from 'awaitify-stream';
-import { UserNotFoundError } from '../errors'
+import { NotCorrectRequestError } from '../errors'
 
 export default class FileController extends BaseController {
   async read(path) {
@@ -39,13 +39,15 @@ export default class FileController extends BaseController {
   async remove(path) {
     try {
       if (false == fs.existsSync(path)) {
-        return false;
+        throw new NotCorrectRequestError('FileController: not exist file name')
       }
+
       fs.unlinkSync(path);
     } catch (e) {
+      return e;
     }
 
-    return true;
+    return null;
   }
 }
 

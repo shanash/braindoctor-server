@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import asyncify from 'express-asyncify';
 import api from './api';
+import fs from 'fs';
 import { UserNotFoundError } from '../errors'
 
 const routes = asyncify(new Router());

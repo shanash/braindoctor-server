@@ -42,8 +42,9 @@ routes.get('/download/:id', async (req, res) => {
 
 routes.post('/remove', async (req, res, next) => {
   let path = './data/' + req.body.filename;
-  if (FC.remove(path) == false) {
-    return res.status(404);
+  let result = await FC.remove(path);
+  if (result != null ) {
+    throw result;
   }
 
   res.redirect(302, '/list');
@@ -66,6 +67,7 @@ routes.post('/read-excel', storage.single('data'), async (req, res, next) => {
   let path = req.file.destination + req.file.filename;
   let data = await FC.read(path);
   let jsonString = await EP.parseToJsonString(data);
+  console.log('Error!! : ', jsonString );
   if (jsonString instanceof Error) {
     throw jsonString;
   }

@@ -20,3 +20,9 @@ export class FileConventionError extends ApplicationError {
     super(message || 'Invalid file specification.', 404);
   }
 }
+
+export class NotCorrectRequestError extends ApplicationError {
+  constructor(message) {
+    super(message || 'Not Correct user reqeust.', 404);
+  }
+}
