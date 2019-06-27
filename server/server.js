@@ -14,7 +14,7 @@ app.use('/api', api);
 app.use(routes);
 
 app.use(function (error, req, res, next) {
-  res.status(error.status).send(error.status + ' Error : ' + error.message);
+  res.status(404).send(error.status + ' Error : ' + error.message);
 });
 
 app.set('port', process.env.PORT || 3000);
