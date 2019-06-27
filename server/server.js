@@ -13,6 +13,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api', api);
 app.use(routes);
 
+app.use(function (error, req, res, next) {
+  res.status(error.status).send(error.status + ' Error : ' + error.message);
+});
+
 app.set('port', process.env.PORT || 3000);
 app.listen(app.get('port'), () => {
   console.log(app.get('port'), '번 포트에서 대기중');

@@ -1,15 +1,15 @@
 import { Router } from 'express';
+import asyncify from 'express-asyncify';
 import fs from 'fs';
 import multer from 'multer';
 import path from 'path';
-import request from 'request';
 import url from 'url';
 import FileController from '../controllers/FileController';
 import ExcelParser from '../controllers/ExcelParser';
 
 const FC = new FileController();
 const EP = new ExcelParser();
-const routes = new Router();
+const routes = asyncify(new Router());
 
 const storageXlsx = multer.diskStorage({
     destination: function(req, file ,callback){
