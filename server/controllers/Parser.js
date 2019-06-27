@@ -1,4 +1,5 @@
 import Utility from './Utility';
+import { FileConventionError } from '../errors'
 
 export default class Parser {
 
@@ -19,7 +20,7 @@ export default class Parser {
 
   parse(data) {
     if (true == this.isWrongData(data)) {
-      return null;
+      return new FileConventionError('Why r u Inputed json string?');
     }
 
     let result = this.parseDetail(data);

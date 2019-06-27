@@ -67,7 +67,6 @@ routes.post('/read-excel', storage.single('data'), async (req, res, next) => {
   let path = req.file.destination + req.file.filename;
   let data = await FC.read(path);
   let jsonString = await EP.parseToJsonString(data);
-  console.log('Error!! : ', jsonString );
   if (jsonString instanceof Error) {
     throw jsonString;
   }
@@ -82,7 +81,10 @@ routes.post('/read-excel', storage.single('data'), async (req, res, next) => {
 
 routes.post('/write', async (req, res, next) => {
   const path = './data/' + req.body.title + '.json';
-  await FC.write(path, req.body.contents);
+  let result = FC.write(path, req.body.contents);
+  if (result instanceof Error) {
+    throw result;
+  }
 
   res.redirect(302, '/list');
 });

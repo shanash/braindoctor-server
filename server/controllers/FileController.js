@@ -31,9 +31,13 @@ export default class FileController extends BaseController {
 
   // write()
   write(path, contents) {
-    let writeStream = fs.createWriteStream(path);
-    writeStream.write(contents);
-    writeStream.end();
+    try {
+      let writeStream = fs.createWriteStream(path);
+      writeStream.write(contents);
+      writeStream.end();
+    } catch(e) {
+      return e;
+    }
   }
 
   async remove(path) {
