@@ -26,3 +26,10 @@ export class NotCorrectRequestError extends ApplicationError {
     super(message || 'Not Correct user reqeust.', 404);
   }
 }
+
+export class CodeError extends ApplicationError {
+  constructor(message) {
+    super(message || 'Not Correct code', 500);
+  }
+}
+

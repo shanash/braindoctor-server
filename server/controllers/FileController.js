@@ -7,7 +7,7 @@ export default class FileController extends BaseController {
   async read(path) {
     let readStream = fs.createReadStream(path);
     let reader = aw.createReader(readStream);
-    let chunk, count = 0;
+    let chunk = null;
     let chunks = [];
 
     while (null !== (chunk = await reader.readAsync())) {
@@ -15,7 +15,6 @@ export default class FileController extends BaseController {
       if (null != chunk) {
         chunks.push(chunk);
       }
-      count++;
     }
 
     let dir = './data';

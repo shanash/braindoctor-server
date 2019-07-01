@@ -23,6 +23,9 @@ export default class Parser {
       return new FileConventionError('Why r u Inputed json string?');
     }
 
+    if (undefined == this.parseDetail ) {
+      return new ServerError('Why define parseDetail Method');
+    }
     let result = this.parseDetail(data);
 
     return result;
