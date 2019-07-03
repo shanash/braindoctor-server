@@ -10,11 +10,16 @@ export default class FileController extends BaseController {
     let chunk = null;
     let chunks = [];
 
-    while (null !== (chunk = await reader.readAsync())) {
-      // Perform any synchronous or asynchronous operation here.
-      if (null != chunk) {
-        chunks.push(chunk);
+    try {
+      while (null !== (chunk = await reader.readAsync())) {
+        // Perform any synchronous or asynchronous operation here.
+        if (null != chunk) {
+          chunks.push(chunk);
+        }
       }
+    } catch (e) {
+      console.log('e : ', e);
+      return null;
     }
 
     let dir = './data';
@@ -34,7 +39,7 @@ export default class FileController extends BaseController {
       let writeStream = fs.createWriteStream(path);
       writeStream.write(contents);
       writeStream.end();
-    } catch(e) {
+    } catch (e) {
       return e;
     }
   }

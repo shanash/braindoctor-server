@@ -64,3 +64,4 @@ typings/
 # server data directories
 data/
 upload/
+sessions/

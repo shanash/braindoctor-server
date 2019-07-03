@@ -1,9 +1,11 @@
+import BaseController from './BaseController';
 import Utility from './Utility';
 import { FileConventionError } from '../errors'
 
-export default class Parser {
+export default class Parser extends BaseController {
 
   constructor() {
+    super();
     if (this.parseDetail == undefined) {
       throw new TypeError("Must override method \'parseDetail\'");
     }
