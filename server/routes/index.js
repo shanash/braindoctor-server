@@ -11,7 +11,9 @@ const folder = './data/';
 const tokenPath = folder + 'token';
 const FC = new FileController();
 
-FC.write(tokenPath, crypto.randomBytes(48).toString('hex'));
+const tokenInFile = crypto.randomBytes(48).toString('hex');
+console.log('tokenInFile : ', tokenInFile);
+FC.write(tokenPath, tokenInFile);
 
 async function isLogin(sessionToken) {
   if (sessionToken == undefined) {
