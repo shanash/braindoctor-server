@@ -1,8 +1,12 @@
 import express from 'express';
+import passport from 'passport';
+//import passportLocal from 'passport-local';
 import routes, { api } from './routes';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import f from 'session-file-store';
 
-const FileStore = require('session-file-store')(session);
+const FileStore = f(session);
 const app = express();
 
 app.set('views', __dirname + '/views');
@@ -12,6 +16,7 @@ app.engine('html', require('ejs').renderFile);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(session({
   secret: '@#@$MYSIGN#@$#$',
   resave: false,

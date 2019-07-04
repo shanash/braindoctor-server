@@ -6,7 +6,6 @@ export default class ExcelParser extends Parser {
   parseDetail(data) {
     const ConvertValue = (value) => {
       let strValue = value.toString();
-      console.log('strValue : ', strValue);
       if (true == strValue.includes('\r\n')) {
         let jarr = new Array();
         let arrValue = strValue.split('\r\n');
@@ -31,7 +30,6 @@ export default class ExcelParser extends Parser {
               let sheet = excelData[sheetName];
               let jCommon = new Object();
               Object.keys(sheet).forEach(function (hIndex) {
-                console.log('hindex : ', hIndex, ' : ', sheet[hIndex]['A']); 
                 if (hIndex != 0) {
                   if (sheet[hIndex]['A'] === undefined ) {
                     throw new FileConventionError('Common : Not Inserted key');
