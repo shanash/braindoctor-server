@@ -71,7 +71,9 @@ routes.get('/list', (req, res, next) => {
 
   let files = fs.readdirSync(folder);
   files.forEach(file => {
-    filenames.push(file);
+    if (file.includes('.json')) {
+      filenames.push(file);
+    }
   });
 
   renderPage(req.session.token, res, function () {
